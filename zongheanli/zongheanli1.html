@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务管理系统</title>
+    <link rel="stylesheet" href="./css/style1.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="./img/pic2.png" alt="任务管理系统logo" class="logo">
+            <h1>任务管理系统</h1>
+        </div>
+        
+        <div class="input-section">
+            <input type="text" id="taskInput" placeholder="请输入新任务...">
+            <button id="addBtn">添加任务</button>
+        </div>
+        
+        <div class="task-controls">
+            <div class="task-filters">
+                <button id="filterAll">全部</button>
+                <button id="filterActive">未完成</button>
+                <button id="filterCompleted">已完成</button>
+            </div>
+            <div class="task-sorts">
+                <button id="sortByName">按名称排序</button>
+                <button id="sortByDate">按日期排序</button>
+            </div>
+        </div>
+        
+        <ul id="taskList"></ul>
+        
+        <div class="stats" id="stats"></div>
+    </div>
+
+    <script src="./js/app1.js"></script>
+</body>
+</html>
