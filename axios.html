@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,23 +10,31 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-        #result, #postResult, #asyncGetResult, #asyncPostResult {
+
+        #result,
+        #postResult,
+        #asyncGetResult,
+        #asyncPostResult {
             margin-top: 20px;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         .form-group label {
             display: block;
             margin-bottom: 5px;
         }
+
         .form-group input {
             width: 300px;
             padding: 8px;
         }
+
         button {
             padding: 8px 15px;
             background-color: #4CAF50;
@@ -35,25 +44,30 @@
             cursor: pointer;
             margin-right: 10px;
         }
+
         button:hover {
             background-color: #45a049;
         }
+
         hr {
             margin: 30px 0;
             border: 0;
             border-top: 1px solid #eee;
         }
+
         h1 {
             color: #2c3e50;
             border-bottom: 2px solid #eee;
             padding-bottom: 10px;
         }
+
         .method-title {
             color: #e74c3c;
             font-weight: bold;
         }
     </style>
 </head>
+
 <body>
     <h1>Axios GET Request Example</h1>
     <button id="fetchButton">Fetch Users</button>
@@ -96,21 +110,43 @@
     <!-- 引入Axios库 -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-        document.getElementById('fetchButton').addEventListener('click',function() {
-            axios.get('https://s5.360game.360.cn/to5/mini/v21/category.html').then(function(res) {
-                console.log(res.data.data,'1111111111111111111111111111111111');
+        // 防抖函数: 多次执行，只执行最后一次
+        function debounce(func, delay) {
+            let timer;
+            return function () {
+                clearTimeout(timer);
+                timer = setTimeout(() => {
+                    func.apply(this, arguments);
+                }, delay);
+            }
+        }
+        // 节流函数: 函数在一定时间内只能执行一次
+        function throttle(func, delay) {
+            let lastTime = 0;
+            return function () {
+                const now = new Date().getTime();
+                if (now - lastTime >= delay) {
+                    func.apply(this, arguments);
+                    lastTime = now;
+                }
+            }
+        }
+
+        document.getElementById('fetchButton').addEventListener('click', debounce(function () {
+            axios.get('https://s5.360game.360.cn/to5/mini/v21/category.html').then(function (res) {
+                console.log(res.data.data, '1111111111111111111111111111111111');
                 const users = res.data.data;
                 const resulyDiv = document.getElementById('result');
                 resulyDiv.innerHTML = '<h2>Users Found:</h2><ul>' + users.map(user => `<li>${user.name}</li>`).join('');
             })
-            .catch(function(err){
-                console.log(err)
-            })
-        })
+                .catch(function (err) {
+                    console.log(err)
+                })
+        }, 1000))
 
         // -------------------------------
 
-        document.getElementById('postButton').addEventListener('click', function() {
+        document.getElementById('postButton').addEventListener('click', throttle(function () {
             const title = document.getElementById('titleInput').value || '默认标题';
             const body = document.getElementById('bodyInput').value || '默认内容';
 
@@ -118,7 +154,7 @@
                 title: title,
                 body: body,
                 userId: 1
-            };
+            }
 
             axios.post('https://jsonplaceholder.typicode.com/posts', postData).then(function (res) {
                 console.log(res, '2222222222')
@@ -132,7 +168,7 @@
             }).catch(function (err) {
                 console.log(err)
             })
-        })
+        },5000))
 
         // Async/Await GET 请求示例---------async/await
         document.getElementById('asyncFetchButton').addEventListener('click', async function () {
@@ -174,4 +210,5 @@
         })
     </script>
 </body>
+
 </html>
