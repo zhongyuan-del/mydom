@@ -344,6 +344,134 @@
         const tableBody = document.getElementById('tableBody');
         const noResults = document.getElementById('noResults');
 
+        // 添加到搜索历史函数
+function addToHistory(keyword) {
+    // 过滤掉相同的关键字（不区分大小写）
+    historyList = historyList.filter(item => item.toLowerCase() !== keyword.toLowerCase());
+    
+    // 把搜索值添加到历史记录的开头
+    historyList.unshift(keyword);
+    
+    // 限制历史记录的最大数量（示例中限制为10条）
+    const maxHistoryItems = 10;
+    if (historyList.length > maxHistoryItems) {
+        historyList = historyList.slice(0, maxHistoryItems);
+    }
+    
+    // 保存到本地存储
+    localStorage.setItem('searchHistory', JSON.stringify(historyList));
+    
+    // 重新渲染历史记录
+    renderHistory();
+    
+    // 显示历史记录容器
+    if (searchHistory) {
+        searchHistory.style.display = 'block';
+    }
+}
+
+// 渲染搜索历史函数
+function renderHistory() {
+    // 清空历史记录容器
+    searchHistory.innerHTML = '';
+    
+    // 如果历史记录为空，隐藏容器并返回
+    if (historyList.length === 0) {
+        searchHistory.style.display = 'none';
+        return;
+    }
+    
+    // 显示历史记录容器
+    searchHistory.style.display = 'block';
+    
+    // 遍历历史记录数组创建DOM元素
+    historyList.forEach(item => {
+        // 创建历史记录项容器
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        
+        // 创建显示文本的span
+        const textSpan = document.createElement('span');
+        textSpan.textContent = item;
+        textSpan.style.flexGrow = '1';
+        textSpan.style.cursor = 'pointer';
+        
+        // 点击历史项填充搜索框并搜索
+        historyItem.addEventListener('click', function(event) {
+            if (!event.target.classList.contains('delete-history')) {
+                searchInput.value = item;
+                searchHistory.style.display = 'none';
+                searchData(item);
+            }
+        });
+        
+        // 创建删除按钮
+        const deleteBtn = document.createElement('span');
+        deleteBtn.className = 'delete-history';
+        deleteBtn.textContent = '×'; // 使用×符号而不是x字母
+        deleteBtn.style.cursor = 'pointer';
+        deleteBtn.style.marginLeft = '10px';
+        
+        // 删除按钮点击事件
+        deleteBtn.addEventListener('click', function(e) {
+            e.stopPropagation(); // 阻止事件冒泡
+            deleteHistory(item);
+        });
+        
+        // 组装DOM元素
+        historyItem.appendChild(textSpan);
+        historyItem.appendChild(deleteBtn);
+        searchHistory.appendChild(historyItem);
+    });
+}
+
+// 删除搜索历史函数
+function deleteHistory(keyword) {
+    // 此时返回的historyList是经过筛选得出的，同时过滤掉相同输入值的新数组
+    historyList = historyList.filter(item => item !== keyword);
+    localStorage.setItem('searchHistory', JSON.stringify(historyList));
+    renderHistory();
+    if (historyList.length === 0) {
+        searchHistory.style.display = 'none';
+    }
+}
+
+// 添加该键松开事件来处理完整的搜索历史
+searchInput.addEventListener('keyup', function (e) {
+    if (e.key === 'Enter') {
+        const keyword = this.value.trim();
+        if (keyword) {
+            addToHistory(keyword);
+        }
+    }
+});
+
+// 当搜索框失去焦点时也添加到历史记录
+searchInput.addEventListener('blur', function () {
+    const keyword = this.value.trim();
+    if (keyword) {
+        addToHistory(keyword);
+    }
+});
+
+// 搜索框获取焦点时显示历史记录
+searchInput.addEventListener('focus', function() {
+    if (historyList.length > 0) {
+        renderHistory();
+        searchHistory.style.display = 'block';
+    }
+});
+
+// 当点击页面其他部分的时候，搜索历史会消失
+document.addEventListener('click', function(e) {
+    if (!searchInput.contains(e.target) && !searchHistory.contains(e.target)) {
+        searchHistory.style.display = 'none';
+    }
+});
+
+// 从本地存储获取搜索历史数据，若无则初始化为空数组
+let historyList = JSON.parse(localStorage.getItem('searchHistory')) || [];
+
         // 防抖函数，一定时间内，多次执行，只执行最后一次
         function debounce(func, delay) {
             let timer;
